@@ -1,0 +1,84 @@
+services:
+  # PostgreSQL with TimescaleDB extension
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: psm-timescaledb
+    environment:
+      POSTGRES_DB: portfolio_db
+      POSTGRES_USER: psm_user
+      POSTGRES_PASSWORD: psm_password
+      TIMESCALEDB_TELEMETRY: 'off'
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U psm_user -d portfolio_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psm-network
+
+  # Redis for caching and pub/sub
+  redis:
+    image: redis:7-alpine
+    container_name: psm-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - psm-network
+
+  # Backend API (Go)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: psm-backend
+    environment:
+      DATABASE_URL: postgres://psm_user:psm_password@timescaledb:5432/portfolio_db?sslmode=disable&client_encoding=UTF8
+      REDIS_URL: redis:6379
+      PORT: 8080
+      GIN_MODE: debug
+    ports:
+      - "8080:8080"
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - psm-network
+    restart: unless-stopped
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: psm-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - psm-network
+    restart: unless-stopped
+
+volumes:
+  timescale_data:
+  redis_data:
+
+networks:
+  psm-network:
+    driver: bridge
