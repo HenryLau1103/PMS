@@ -23,6 +23,7 @@ type SyncStatus struct {
 	ProcessedCount  int       `json:"processed_count"`
 	SuccessCount    int       `json:"success_count"`
 	FailedCount     int       `json:"failed_count"`
+	SkippedCount    int       `json:"skipped_count"`
 	CurrentSymbol   string    `json:"current_symbol"`
 	StartedAt       time.Time `json:"started_at,omitempty"`
 	CompletedAt     time.Time `json:"completed_at,omitempty"`
@@ -146,8 +147,8 @@ func (h *BulkSyncHandler) StopBulkSync(c *fiber.Ctx) error {
 func (h *BulkSyncHandler) runBulkSync(portfolioID string, startDate, endDate time.Time, priorityHoldings bool) {
 	ctx := context.Background()
 
-	// Get list of symbols to sync
-	symbols, err := h.getSymbolsToSync(ctx, portfolioID, priorityHoldings)
+	// Get list of symbols to sync (skip already synced ones)
+	symbols, err := h.getSymbolsToSync(ctx, portfolioID, priorityHoldings, startDate, endDate)
 	if err != nil {
 		h.mu.Lock()
 		h.syncStatus.IsRunning = false
@@ -157,8 +158,16 @@ func (h *BulkSyncHandler) runBulkSync(portfolioID string, startDate, endDate tim
 		return
 	}
 
+	// Count already synced symbols
+	allStocksQuery := `SELECT COUNT(*) FROM taiwan_stocks`
+	var totalStocks int
+	h.db.QueryRow(allStocksQuery).Scan(&totalStocks)
+	
+	skippedCount := totalStocks - len(symbols)
+
 	h.mu.Lock()
 	h.syncStatus.TotalSymbols = len(symbols)
+	h.syncStatus.SkippedCount = skippedCount
 	h.mu.Unlock()
 
 	// Sync each symbol with rate limiting (avoid TWSE API rate limits)
@@ -211,8 +220,26 @@ func (h *BulkSyncHandler) runBulkSync(portfolioID string, startDate, endDate tim
 	h.mu.Unlock()
 }
 
-func (h *BulkSyncHandler) getSymbolsToSync(ctx context.Context, portfolioID string, priorityHoldings bool) ([]string, error) {
+func (h *BulkSyncHandler) getSymbolsToSync(ctx context.Context, portfolioID string, priorityHoldings bool, startDate, endDate time.Time) ([]string, error) {
 	var symbols []string
+
+	// Get symbols that already have data in the date range (to skip them)
+	syncedSymbols := make(map[string]bool)
+	skipQuery := `
+		SELECT DISTINCT symbol 
+		FROM stock_ohlcv 
+		WHERE timestamp >= $1 AND timestamp <= $2
+	`
+	skipRows, err := h.db.Query(skipQuery, startDate, endDate)
+	if err == nil {
+		defer skipRows.Close()
+		for skipRows.Next() {
+			var symbol string
+			if err := skipRows.Scan(&symbol); err == nil {
+				syncedSymbols[symbol] = true
+			}
+		}
+	}
 
 	if priorityHoldings && portfolioID != "" {
 		// Get holdings first
@@ -233,11 +260,14 @@ func (h *BulkSyncHandler) getSymbolsToSync(ctx context.Context, portfolioID stri
 			if err := rows.Scan(&symbol); err != nil {
 				continue
 			}
-			symbols = append(symbols, symbol)
+			// Only add if not already synced
+			if !syncedSymbols[symbol] {
+				symbols = append(symbols, symbol)
+			}
 		}
 	}
 
-	// Get all stocks
+	// Get all stocks that haven't been synced yet
 	query := `SELECT symbol FROM taiwan_stocks ORDER BY symbol`
 	rows, err := h.db.Query(query)
 	if err != nil {
@@ -251,8 +281,8 @@ func (h *BulkSyncHandler) getSymbolsToSync(ctx context.Context, portfolioID stri
 		if err := rows.Scan(&symbol); err != nil {
 			continue
 		}
-		// Skip if already in holdings list
-		if !contains(symbols, symbol) {
+		// Skip if already synced or in holdings list
+		if !syncedSymbols[symbol] && !contains(symbols, symbol) {
 			allSymbols = append(allSymbols, symbol)
 		}
 	}

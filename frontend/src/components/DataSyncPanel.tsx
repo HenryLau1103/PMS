@@ -11,6 +11,7 @@ interface SyncStatus {
   processed_count: number;
   success_count: number;
   failed_count: number;
+  skipped_count: number;
   current_symbol: string;
   started_at?: string;
   completed_at?: string;
@@ -172,9 +173,9 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
           </div>
 
           {/* Status Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-xs text-gray-500 mb-1">總數</p>
+              <p className="text-xs text-gray-500 mb-1">待同步</p>
               <p className="text-xl font-bold text-gray-900">{syncStatus.total_symbols}</p>
             </div>
             <div className="bg-green-50 rounded-lg p-3">
@@ -184,6 +185,10 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
             <div className="bg-red-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">失敗</p>
               <p className="text-xl font-bold text-red-600">{syncStatus.failed_count}</p>
+            </div>
+            <div className="bg-purple-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">已跳過</p>
+              <p className="text-xl font-bold text-purple-600">{syncStatus.skipped_count || 0}</p>
             </div>
             <div className="bg-blue-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">已處理</p>
@@ -259,6 +264,7 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
           <p>點擊按鈕開始同步最近2年市場數據 (2024-2026)</p>
           <p className="mt-2">• 優先同步: 先同步您的持倉股票，再同步其他股票</p>
           <p>• 全部同步: 同步所有1,943支台股 (約需2-3小時)</p>
+          <p className="mt-2 text-green-600">✓ 支援斷點續傳: 已同步的股票會自動跳過</p>
         </div>
       )}
     </div>
