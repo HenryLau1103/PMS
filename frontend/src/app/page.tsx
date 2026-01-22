@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import TransactionForm from '@/components/TransactionForm';
 import PortfolioDashboard from '@/components/PortfolioDashboard';
+import DataSyncPanel from '@/components/DataSyncPanel';
 import StockChart from '@/components/Chart/StockChart';
 import ChartControls from '@/components/Chart/ChartControls';
 import type { ChartConfig } from '@/types/chart';
@@ -68,12 +69,15 @@ export default function Home() {
             />
           </div>
 
-          {/* Right Column: Portfolio Dashboard */}
-          <div>
+          {/* Right Column: Portfolio Dashboard + Data Sync Panel */}
+          <div className="space-y-6">
             <PortfolioDashboard
               portfolioId={DEMO_PORTFOLIO_ID}
               refreshTrigger={refreshTrigger}
             />
+            
+            {/* Data Sync Panel - Below Portfolio Dashboard */}
+            <DataSyncPanel portfolioId={DEMO_PORTFOLIO_ID} />
           </div>
         </div>
 

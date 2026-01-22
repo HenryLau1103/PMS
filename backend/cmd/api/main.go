@@ -52,6 +52,7 @@ func main() {
 	stockSyncHandler := handlers.NewStockSyncHandler(stockSyncService)
 	marketDataHandler := handlers.NewMarketDataHandler(marketDataService)
 	indicatorHandler := handlers.NewIndicatorHandler(taService)
+	bulkSyncHandler := handlers.NewBulkSyncHandler(marketDataService, db)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -115,6 +116,11 @@ func main() {
 	api.Get("/indicators/:symbol/bb", indicatorHandler.GetBollingerBands)
 	api.Get("/indicators/:symbol/kdj", indicatorHandler.GetKDJ)
 	api.Post("/indicators/:symbol/batch", indicatorHandler.GetBatchIndicators)
+
+	// Bulk sync routes (Phase 2.5)
+	api.Get("/market/bulk-sync/status", bulkSyncHandler.GetSyncStatus)
+	api.Post("/market/bulk-sync/start", bulkSyncHandler.StartBulkSync)
+	api.Post("/market/bulk-sync/stop", bulkSyncHandler.StopBulkSync)
 
 	// Start server
 	log.Printf("🚀 Server starting on port %s", port)
