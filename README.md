@@ -1,5 +1,14 @@
 # 台股智能投資組合管理系統 (PSM)
 
+[![Phase](https://img.shields.io/badge/Phase-1%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
+[![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=flat-square&logo=go)](https://go.dev/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![TimescaleDB](https://img.shields.io/badge/TimescaleDB-PostgreSQL%2015-FDB515?style=flat-square&logo=timescale)](https://www.timescale.com/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
+[![Taiwan Stock](https://img.shields.io/badge/Taiwan%20Stock-1943%20stocks-red?style=flat-square)](https://www.twse.com.tw/)
+
 Portfolio Stock Management System - 專業的台股投資組合管理平台
 
 ## 🎯 Phase 1: 核心基礎功能 (MVP)
