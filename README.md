@@ -1,6 +1,6 @@
 # 台股智能投資組合管理系統 (PSM)
 
-[![Phase](https://img.shields.io/badge/Phase-1%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
+[![Phase](https://img.shields.io/badge/Phase-2%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
 [![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=flat-square&logo=go)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
@@ -11,9 +11,9 @@
 
 Portfolio Stock Management System - 專業的台股投資組合管理平台
 
-## 🎯 Phase 1: 核心基礎功能 (MVP)
+## 🎯 Phase 1: 核心基礎功能 (MVP) ✅
 
-### ✅ 已完成功能
+### 已完成功能
 - ✅ PostgreSQL + TimescaleDB 資料庫架構
 - ✅ Go Backend API (Fiber框架)
 - ✅ Next.js Frontend (React + TypeScript)
@@ -23,12 +23,56 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 - ✅ Docker容器化部署
 - ✅ 台股手續費與稅金自動計算
 
+## 📈 Phase 2: 技術分析與市場數據 ✅
+
+### Phase 2.1: 市場數據基礎設施 ✅
+- ✅ TimescaleDB Hypertable 時間序列架構
+- ✅ TWSE/TPEx API 整合 (1,943支台股)
+- ✅ 連續聚合 (Daily/Weekly/Monthly)
+- ✅ OHLCV 數據API
+- ✅ 自動同步機制
+
+### Phase 2.2: 技術分析引擎 ✅
+- ✅ TA-Lib 整合 (markcheno/go-talib)
+- ✅ 5大核心指標:
+  - MA (移動平均線)
+  - RSI (相對強弱指標)
+  - MACD (指數平滑移動平均線)
+  - Bollinger Bands (布林通道)
+  - KDJ (隨機指標)
+- ✅ Redis 快取層 (24小時TTL)
+- ✅ 批次指標查詢API
+
+### Phase 2.3: TradingView 圖表前端 ✅
+- ✅ TradingView Lightweight Charts v4.1.3
+- ✅ 蠟燭圖 + 成交量顯示
+- ✅ 深色主題 (專業配色)
+- ✅ 多指標疊加顯示
+- ✅ 指標參數動態調整
+- ✅ 響應式圖表設計
+
+### Phase 2.4: 主頁整合 ✅
+- ✅ 技術圖表整合到儀表板
+- ✅ 自動填入最新收盤價
+- ✅ 優化版面配置
+- ✅ 股票代號快速切換
+
+### Phase 2.5: 批量數據同步 ✅
+- ✅ 批量同步1,943支台股
+- ✅ 即時進度追蹤
+- ✅ 優先同步持倉股票
+- ✅ 失敗重試與錯誤追蹤
+- ✅ 速率限制 (符合TWSE規範)
+- ✅ 背景異步處理
+- ✅ 最近2年歷史數據 (2024-2026)
+
 ## 🏗️ 系統架構
 
 ```
 ┌─────────────────────┐    ┌──────────────────────┐    ┌─────────────────────┐
-│   Frontend (React)  │◄───│  API Gateway (Go)    │◄───│  Database           │
-│   Next.js + Tailwind│    │  Fiber Framework     │    │  TimescaleDB        │
+│   Frontend (React)  │◄───│  API Gateway (Go)    │◄───│  TimescaleDB        │
+│   Next.js + Chart   │    │  Fiber + TA-Lib      │    │  Hypertables        │
+│   TradingView       │    │  Redis Cache         │    │  Aggregates         │
 └─────────────────────┘    └──────────────────────┘    └─────────────────────┘
 ```
 
@@ -39,12 +83,15 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 - React 18
 - TypeScript
 - Tailwind CSS
+- TradingView Lightweight Charts v4.1.3
 - Axios
 
 **Backend:**
 - Go 1.21
 - Fiber Web Framework
+- TA-Lib (Technical Analysis Library)
 - PostgreSQL Driver
+- Redis Client
 - UUID & Decimal 處理
 
 **Database:**
@@ -63,7 +110,7 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 
 ```bash
 # 1. Clone 專案
-git clone <repository-url>
+git clone https://github.com/HenryLau1103/PMS.git
 cd PSM
 
 # 2. 啟動所有服務
@@ -77,35 +124,17 @@ docker-compose logs -f
 ```
 
 服務端口:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8080
-- Database: localhost:5432
-- Redis: localhost:6379
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8080
+- **Database**: localhost:5432
+- **Redis**: localhost:6379
 
-### 本地開發模式
+### 首次使用 - 同步市場數據
 
-#### 啟動 Database
-
-```bash
-docker-compose up -d timescaledb redis
-```
-
-#### 啟動 Backend
-
-```bash
-cd backend
-cp .env.example .env
-go mod download
-go run cmd/api/main.go
-```
-
-#### 啟動 Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
+1. 打開 http://localhost:3000
+2. 在右側「市場數據同步」面板
+3. 點擊「同步所有股票」
+4. 等待同步完成 (~1.6小時)
 
 ## 📊 資料庫 Schema
 
@@ -125,10 +154,14 @@ npm run dev
 - FIFO 成本基礎追蹤
 - 已實現/未實現損益計算
 
-**corporate_actions** - 公司行動事件
-- 除權息處理
-- 股票分割/合併
-- 價格調整因子
+**stock_ohlcv** - OHLCV時間序列 (Hypertable)
+- 每日開高低收成交量數據
+- TimescaleDB 壓縮與分區
+- 連續聚合支援
+
+**technical_indicators** - 技術指標快取
+- 計算結果快取
+- 定期更新機制
 
 ## 🔌 API 端點
 
@@ -142,9 +175,20 @@ npm run dev
 - `GET /api/v1/portfolios/:id/positions/:symbol` - 查詢特定持倉
 - `GET /api/v1/portfolios/:id/positions/:symbol/pnl` - 計算未實現損益
 
-### 投資組合
-- `GET /api/v1/portfolios/:id` - 查詢投資組合
-- `GET /api/v1/portfolios` - 查詢用戶所有投資組合
+### 市場數據
+- `GET /api/v1/stocks/:symbol/ohlcv` - 查詢OHLCV數據
+- `POST /api/v1/market/sync` - 單一股票同步
+- `POST /api/v1/market/bulk-sync/start` - 批量同步
+- `GET /api/v1/market/bulk-sync/status` - 同步進度
+- `POST /api/v1/market/bulk-sync/stop` - 停止同步
+
+### 技術指標
+- `GET /api/v1/indicators/:symbol/ma` - 移動平均線
+- `GET /api/v1/indicators/:symbol/rsi` - RSI指標
+- `GET /api/v1/indicators/:symbol/macd` - MACD指標
+- `GET /api/v1/indicators/:symbol/bb` - 布林通道
+- `GET /api/v1/indicators/:symbol/kdj` - KDJ指標
+- `POST /api/v1/indicators/:symbol/batch` - 批次查詢
 
 ### 健康檢查
 - `GET /health` - 系統健康狀態
@@ -161,55 +205,68 @@ npm run dev
 - 證券交易稅: 0.3%
 
 ### 股票代號格式
-- TSE (台灣證券交易所): `2330.TW`
-- TPEx (櫃買中心): `6488.TWO`
+- TSE (台灣證券交易所): `2330`, `2454`
+- TPEx (櫃買中心): `6488`, `5347`
 
-## 🧪 測試與驗證
+## 🎨 功能展示
 
-### 測試案例: 台積電 (2330.TW) 交易
+### 主儀表板
+- 交易表單 (左側)
+- 投資組合概覽 (右上)
+- 市場數據同步面板 (右下)
+- 技術分析圖表 (底部)
 
-```json
-{
-  "portfolio_id": "00000000-0000-0000-0000-000000000011",
-  "event_type": "BUY",
-  "symbol": "2330.TW",
-  "quantity": "1000",
-  "price": "580.00",
-  "fee": "0",
-  "tax": "0",
-  "occurred_at": "2024-01-22T10:30:00Z",
-  "notes": "測試買入台積電"
-}
-```
+### 技術分析圖表
+- K線圖 + 成交量
+- 動態指標切換
+- 參數即時調整
+- 多時間框架支援
 
-系統自動計算:
-- 交易金額: $580,000
-- 手續費: $826.50 (0.1425%)
-- 總成本: $580,826.50
+### 批量同步功能
+- 即時進度條
+- 成功/失敗統計
+- 失敗股票列表
+- 用時追蹤
 
 ## 📁 專案結構
 
 ```
 PSM/
 ├── backend/
-│   ├── cmd/api/          # 主程式進入點
+│   ├── cmd/api/              # 主程式進入點
 │   ├── internal/
-│   │   ├── database/     # 資料庫連接
-│   │   ├── handlers/     # HTTP handlers
-│   │   ├── models/       # 資料模型
-│   │   └── services/     # 業務邏輯
+│   │   ├── database/         # 資料庫連接
+│   │   ├── handlers/         # HTTP handlers
+│   │   │   ├── bulk_sync_handler.go
+│   │   │   ├── indicator_handler.go
+│   │   │   └── market_data_handler.go
+│   │   ├── models/           # 資料模型
+│   │   └── services/         # 業務邏輯
+│   │       ├── market_data_service.go
+│   │       └── technical_analysis_service.go
 │   ├── Dockerfile
 │   └── go.mod
 ├── frontend/
 │   ├── src/
-│   │   ├── app/          # Next.js App Router
-│   │   ├── components/   # React 組件
-│   │   ├── lib/          # 工具函數
-│   │   └── types/        # TypeScript 類型
+│   │   ├── app/              # Next.js App Router
+│   │   │   ├── page.tsx      # 主儀表板
+│   │   │   └── analysis/     # 技術分析頁
+│   │   ├── components/       # React 組件
+│   │   │   ├── Chart/        # 圖表組件
+│   │   │   │   ├── StockChart.tsx
+│   │   │   │   └── ChartControls.tsx
+│   │   │   ├── DataSyncPanel.tsx
+│   │   │   └── PortfolioDashboard.tsx
+│   │   ├── lib/              # 工具函數
+│   │   │   └── chartApi.ts
+│   │   └── types/            # TypeScript 類型
 │   ├── Dockerfile
 │   └── package.json
 ├── database/
-│   └── migrations/       # SQL 遷移腳本
+│   └── migrations/           # SQL 遷移腳本
+│       ├── 001_init.sql
+│       ├── 002_taiwan_stocks.sql
+│       └── 003_market_data.sql
 ├── docker-compose.yml
 └── README.md
 ```
@@ -220,28 +277,32 @@ PSM/
 - CORS 設定
 - Input 驗證 (台股代號格式、數值範圍)
 - 不可變交易記錄 (Audit Trail)
+- Redis 快取過期機制
+- API 速率限制 (TWSE規範)
 
-## 📈 下一階段功能 (Phase 2-5)
+## 📈 開發路線圖
 
-### Phase 2: 技術分析 (規劃中)
-- [ ] TA-Lib 200+ 技術指標
-- [ ] TradingView Lightweight Charts
-- [ ] 多時間框架分析
-
-### Phase 3: 即時數據 (規劃中)
-- [ ] WebSocket 即時價格
+### Phase 3: 即時數據 (計劃中)
+- [ ] WebSocket 即時價格推送
 - [ ] 台股交易時間限制
 - [ ] 漲跌停視覺化
+- [ ] 盤中五檔報價
+- [ ] 個股成交明細
 
-### Phase 4: AI 分析 (規劃中)
+### Phase 4: AI 分析 (計劃中)
 - [ ] 鉅亨網新聞爬取
 - [ ] 中文情感分析
 - [ ] GPT-4 投資建議
+- [ ] 異常交易偵測
+- [ ] 智能選股推薦
 
-### Phase 5: 優化 (規劃中)
+### Phase 5: 優化與擴展 (計劃中)
 - [ ] 效能優化
 - [ ] 行動響應式設計
-- [ ] 資料匯出功能
+- [ ] 資料匯出功能 (CSV/Excel)
+- [ ] 多帳戶管理
+- [ ] 權限控制系統
+- [ ] 回測系統
 
 ## 🐛 疑難排解
 
@@ -260,10 +321,32 @@ docker-compose logs timescaledb
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
+### 圖表無數據顯示
+1. 檢查是否已同步市場數據
+2. 查看同步進度: 訪問主頁右下角「市場數據同步」面板
+3. 手動觸發同步: 點擊「同步所有股票」按鈕
+
 ### 清空所有資料重新開始
 ```bash
 docker-compose down -v
 docker-compose up -d
+```
+
+## 🧪 測試
+
+### 測試OHLCV API
+```bash
+curl "http://localhost:8080/api/v1/stocks/2330/ohlcv?limit=10"
+```
+
+### 測試技術指標API
+```bash
+curl "http://localhost:8080/api/v1/indicators/2330/ma?period=20"
+```
+
+### 測試同步狀態
+```bash
+curl "http://localhost:8080/api/v1/market/bulk-sync/status"
 ```
 
 ## 📝 License
@@ -276,5 +359,6 @@ Developed with ❤️ for Taiwan Stock Market Investors
 
 ---
 
-**Phase 1 Status:** ✅ 完成  
-**Last Updated:** 2024-01-22
+**Phase 1 Status:** ✅ 完成 (2024-01-22)  
+**Phase 2 Status:** ✅ 完成 (2026-01-22)  
+**Last Updated:** 2026-01-22
