@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createEvent } from '@/lib/api';
+import { getLatestPrice } from '@/lib/chartApi';
 import type { EventType, TaiwanStock } from '@/types/api';
 import StockAutocomplete from './StockAutocomplete';
 
@@ -94,12 +95,23 @@ export default function TransactionForm({ portfolioId, onSuccess }: TransactionF
     }
   };
 
-  const handleStockSelect = (stock: TaiwanStock) => {
+  const handleStockSelect = async (stock: TaiwanStock) => {
     setFormData({
       ...formData,
       symbol: stock.symbol,
       stock_name: stock.name,
     });
+    
+    // Auto-fetch latest closing price
+    const latestPrice = await getLatestPrice(stock.symbol);
+    if (latestPrice) {
+      setFormData(prev => ({
+        ...prev,
+        symbol: stock.symbol,
+        stock_name: stock.name,
+        price: latestPrice.toString(),
+      }));
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {

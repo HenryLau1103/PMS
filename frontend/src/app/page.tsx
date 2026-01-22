@@ -58,26 +58,29 @@ export default function Home() {
       </header>
 
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Main Layout: 3 columns on large screens */}
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          {/* Left Column: Transaction Form (3/12) */}
-          <div className="xl:col-span-3">
+        {/* Top Section: Transaction Form + Portfolio Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Left Column: Transaction Form */}
+          <div>
             <TransactionForm
               portfolioId={DEMO_PORTFOLIO_ID}
               onSuccess={handleTransactionSuccess}
             />
-            
-            {/* Portfolio Dashboard moved below form */}
-            <div className="mt-6">
-              <PortfolioDashboard
-                portfolioId={DEMO_PORTFOLIO_ID}
-                refreshTrigger={refreshTrigger}
-              />
-            </div>
           </div>
 
-          {/* Middle Column: Stock Chart (7/12) */}
-          <div className="xl:col-span-7">
+          {/* Right Column: Portfolio Dashboard */}
+          <div>
+            <PortfolioDashboard
+              portfolioId={DEMO_PORTFOLIO_ID}
+              refreshTrigger={refreshTrigger}
+            />
+          </div>
+        </div>
+
+        {/* Bottom Section: Technical Analysis Chart */}
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
+          {/* Chart Area (10/12) */}
+          <div className="xl:col-span-10">
             <div className="bg-white rounded-lg shadow-lg p-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -105,7 +108,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Column: Chart Controls (2/12) */}
+          {/* Chart Controls (2/12) */}
           <div className="xl:col-span-2">
             <ChartControls
               config={chartConfig}

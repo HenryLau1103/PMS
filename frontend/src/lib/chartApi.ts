@@ -25,8 +25,19 @@ export async function getOHLCV(
   limit: number = 500
 ): Promise<OHLCVData[]> {
   const params = new URLSearchParams();
-  if (from) params.append('from', from);
-  if (to) params.append('to', to);
+  
+  // Default to fetch last 2 years of data if no date range provided
+  if (!from) {
+    const defaultFrom = new Date();
+    defaultFrom.setFullYear(defaultFrom.getFullYear() - 2);
+    from = defaultFrom.toISOString().split('T')[0];
+  }
+  if (!to) {
+    to = new Date().toISOString().split('T')[0];
+  }
+  
+  params.append('from', from);
+  params.append('to', to);
   params.append('limit', limit.toString());
 
   const response = await api.get(`/api/v1/stocks/${symbol}/ohlcv?${params.toString()}`);
@@ -134,4 +145,18 @@ export function parseIndicatorData(data: MAData[] | RSIData[]): { time: number; 
     time: toUnixTimestamp(d.timestamp),
     value: parseFloat(d.value),
   }));
+}
+
+// Get latest closing price for a symbol
+export async function getLatestPrice(symbol: string): Promise<number | null> {
+  try {
+    const ohlcv = await getOHLCV(symbol, undefined, undefined, 1);
+    if (ohlcv && ohlcv.length > 0) {
+      return parseFloat(ohlcv[0].close);
+    }
+    return null;
+  } catch (error) {
+    console.error('Failed to fetch latest price:', error);
+    return null;
+  }
 }
