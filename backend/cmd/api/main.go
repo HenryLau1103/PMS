@@ -47,6 +47,11 @@ func main() {
 	marketDataService := services.NewMarketDataService(db)
 	taService := services.NewTechnicalAnalysisService(db, redisClient)
 	realtimeService := services.NewRealtimeService(db)
+	newsService := services.NewNewsService(db)
+	sentimentService := services.NewSentimentService(db)
+	aiService := services.NewAIService(db)
+	alertService := services.NewAlertService(db)
+	screenerService := services.NewScreenerService(db)
 
 	// Initialize handlers
 	ledgerHandler := handlers.NewLedgerHandler(ledgerService)
@@ -56,6 +61,11 @@ func main() {
 	indicatorHandler := handlers.NewIndicatorHandler(taService)
 	bulkSyncHandler := handlers.NewBulkSyncHandler(marketDataService, db)
 	realtimeHandler := handlers.NewRealtimeHandler(realtimeService)
+	newsHandler := handlers.NewNewsHandler(newsService)
+	sentimentHandler := handlers.NewSentimentHandler(sentimentService)
+	aiHandler := handlers.NewAIHandler(aiService)
+	alertHandler := handlers.NewAlertHandler(alertService)
+	screenerHandler := handlers.NewScreenerHandler(screenerService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -122,6 +132,7 @@ func main() {
 
 	// Bulk sync routes (Phase 2.5)
 	api.Get("/market/bulk-sync/status", bulkSyncHandler.GetSyncStatus)
+	api.Get("/market/bulk-sync/info", bulkSyncHandler.GetSyncInfo)
 	api.Post("/market/bulk-sync/start", bulkSyncHandler.StartBulkSync)
 	api.Post("/market/bulk-sync/stop", bulkSyncHandler.StopBulkSync)
 
@@ -129,6 +140,41 @@ func main() {
 	api.Get("/market/status", realtimeHandler.GetMarketStatus)
 	api.Get("/realtime/:symbol", realtimeHandler.GetRealtimeQuote)
 	api.Get("/realtime", realtimeHandler.GetBatchQuotes)
+
+	// News routes (Phase 4.1)
+	api.Get("/news", newsHandler.GetRecentNews)
+	api.Get("/news/:symbol", newsHandler.GetNews)
+	api.Post("/news/fetch", newsHandler.FetchGeneralNews)
+	api.Post("/news/:symbol/fetch", newsHandler.FetchNews)
+
+	// Sentiment routes (Phase 4.2)
+	api.Get("/sentiment/:symbol", sentimentHandler.GetSentimentSummary)
+	api.Post("/sentiment/analyze", sentimentHandler.AnalyzeUnanalyzedNews)
+	api.Post("/sentiment/article/:id", sentimentHandler.AnalyzeSingleArticle)
+	api.Post("/sentiment/text", sentimentHandler.AnalyzeText)
+
+	// AI analysis routes (Phase 4.3)
+	api.Get("/ai/status", aiHandler.GetStatus)
+	api.Get("/ai/:symbol/analysis", aiHandler.GetAnalysis)
+	api.Get("/ai/:symbol/daily", aiHandler.GetDailySummary)
+	api.Get("/ai/:symbol/advice", aiHandler.GetInvestmentAdvice)
+	api.Get("/ai/:symbol/history", aiHandler.GetCachedAnalyses)
+	api.Delete("/ai/:symbol/cache", aiHandler.ClearCache)
+
+	// Alert routes (Phase 4.4)
+	api.Get("/alerts", alertHandler.GetAlerts)
+	api.Get("/alerts/stats", alertHandler.GetAlertStats)
+	api.Post("/alerts/scan", alertHandler.ScanAll)
+	api.Get("/alerts/:symbol", alertHandler.GetAlertsBySymbol)
+	api.Get("/alerts/:symbol/volume", alertHandler.DetectVolumeSpike)
+	api.Get("/alerts/:symbol/price", alertHandler.DetectPriceBreakout)
+	api.Post("/alerts/:id/ack", alertHandler.AcknowledgeAlert)
+
+	// Screener routes (Phase 4.5)
+	api.Get("/screener/presets", screenerHandler.GetPresets)
+	api.Get("/screener/preset/:name", screenerHandler.RunPreset)
+	api.Get("/screener/quick/:type", screenerHandler.QuickScreen)
+	api.Post("/screener/screen", screenerHandler.ScreenStocks)
 
 	// WebSocket endpoint for real-time updates
 	app.Use("/ws", realtimeHandler.WebSocketUpgrade)

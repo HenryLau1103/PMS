@@ -9,6 +9,7 @@ import ChartControls from '@/components/Chart/ChartControls';
 import MarketStatusIndicator from '@/components/MarketStatusIndicator';
 import OrderBookPanel from '@/components/OrderBookPanel';
 import TradeTickPanel from '@/components/TradeTickPanel';
+import AIAnalysisPanel from '@/components/AIAnalysisPanel';
 import type { ChartConfig } from '@/types/chart';
 
 // Demo portfolio ID (matches database seed data)
@@ -55,7 +56,7 @@ export default function Home() {
                 完整技術分析頁面
               </a>
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                Phase 3: 即時數據完成
+                Phase 4: AI 分析完成
               </span>
             </div>
           </div>
@@ -127,43 +128,69 @@ export default function Home() {
           </div>
         </div>
 
+        {/* AI Analysis Section - Full Width */}
+        <div className="mt-8">
+          <AIAnalysisPanel symbol={selectedSymbol} />
+        </div>
+
         {/* Footer Info */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold mb-4">系統功能狀態</h3>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
               <div>
-                <p className="font-medium">交易記錄</p>
-                <p className="text-sm text-gray-500">Phase 1</p>
+                <p className="font-medium text-sm">交易記錄</p>
+                <p className="text-xs text-gray-500">Phase 1</p>
               </div>
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
               <div>
-                <p className="font-medium">持倉管理</p>
-                <p className="text-sm text-gray-500">Phase 1</p>
+                <p className="font-medium text-sm">持倉管理</p>
+                <p className="text-xs text-gray-500">Phase 1</p>
               </div>
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
               <div>
-                <p className="font-medium">技術分析</p>
-                <p className="text-sm text-gray-500">Phase 2</p>
+                <p className="font-medium text-sm">技術分析</p>
+                <p className="text-xs text-gray-500">Phase 2</p>
               </div>
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
               <div>
-                <p className="font-medium">即時報價</p>
-                <p className="text-sm text-gray-500">Phase 3</p>
+                <p className="font-medium text-sm">即時報價</p>
+                <p className="text-xs text-gray-500">Phase 3</p>
               </div>
             </div>
             <div className="flex items-center">
               <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
               <div>
-                <p className="font-medium">五檔成交</p>
-                <p className="text-sm text-gray-500">Phase 3</p>
+                <p className="font-medium text-sm">新聞爬取</p>
+                <p className="text-xs text-gray-500">Phase 4</p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
+              <div>
+                <p className="font-medium text-sm">情感分析</p>
+                <p className="text-xs text-gray-500">Phase 4</p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
+              <div>
+                <p className="font-medium text-sm">AI 分析</p>
+                <p className="text-xs text-gray-500">Phase 4</p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="w-3 h-3 bg-green-500 rounded-full mr-3"></span>
+              <div>
+                <p className="font-medium text-sm">智能選股</p>
+                <p className="text-xs text-gray-500">Phase 4</p>
               </div>
             </div>
           </div>
