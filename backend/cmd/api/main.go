@@ -35,11 +35,13 @@ func main() {
 	ledgerService := services.NewLedgerService(db)
 	stockService := services.NewStockService(db)
 	stockSyncService := services.NewStockSyncService(db)
+	marketDataService := services.NewMarketDataService(db)
 
 	// Initialize handlers
 	ledgerHandler := handlers.NewLedgerHandler(ledgerService)
 	stockHandler := handlers.NewStockHandler(stockService)
 	stockSyncHandler := handlers.NewStockSyncHandler(stockSyncService)
+	marketDataHandler := handlers.NewMarketDataHandler(marketDataService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -90,6 +92,11 @@ func main() {
 	api.Get("/stocks/search", stockHandler.SearchStocks)
 	api.Get("/stocks/:symbol", stockHandler.GetStock)
 	api.Post("/stocks/sync", stockSyncHandler.SyncStocks)
+
+	// Market data routes (Phase 2)
+	api.Get("/stocks/:symbol/ohlcv", marketDataHandler.GetOHLCV)
+	api.Post("/market/sync", marketDataHandler.SyncMarketData)
+	api.Post("/market/refresh-aggregates", marketDataHandler.RefreshAggregates)
 
 	// Start server
 	log.Printf("🚀 Server starting on port %s", port)
