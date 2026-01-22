@@ -219,7 +219,7 @@ func (h *BulkSyncHandler) getSymbolsToSync(ctx context.Context, portfolioID stri
 		query := `
 			SELECT DISTINCT symbol 
 			FROM positions_current 
-			WHERE portfolio_id = $1 AND quantity > 0
+			WHERE portfolio_id = $1 AND total_quantity > 0
 			ORDER BY symbol
 		`
 		rows, err := h.db.Query(query, portfolioID)
