@@ -59,10 +59,18 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
     setError(null);
 
     try {
+      // Calculate date range: last 2 years to current date
+      const today = new Date();
+      const twoYearsAgo = new Date();
+      twoYearsAgo.setFullYear(today.getFullYear() - 2);
+      
+      const startDate = twoYearsAgo.toISOString().split('T')[0];
+      const endDate = today.toISOString().split('T')[0];
+
       const response = await axios.post(`${API_BASE_URL}/api/v1/market/bulk-sync/start`, {
         portfolio_id: portfolioId,
-        start_date: '2024-01-01',
-        end_date: '2024-12-31',
+        start_date: startDate,
+        end_date: endDate,
         priority_holdings: priorityHoldings,
       });
 
@@ -248,7 +256,7 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
       {/* Info */}
       {!syncStatus && (
         <div className="text-sm text-gray-500">
-          <p>點擊按鈕開始同步2024年市場數據</p>
+          <p>點擊按鈕開始同步最近2年市場數據 (2024-2026)</p>
           <p className="mt-2">• 優先同步: 先同步您的持倉股票，再同步其他股票</p>
           <p>• 全部同步: 同步所有1,943支台股 (約需2-3小時)</p>
         </div>
