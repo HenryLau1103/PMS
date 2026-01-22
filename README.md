@@ -1,6 +1,6 @@
 # 台股智能投資組合管理系統 (PSM)
 
-[![Phase](https://img.shields.io/badge/Phase-2%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
+[![Phase](https://img.shields.io/badge/Phase-3%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
 [![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=flat-square&logo=go)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
@@ -65,6 +65,36 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 - ✅ 速率限制 (符合TWSE規範)
 - ✅ 背景異步處理
 - ✅ 最近2年歷史數據 (2024-2026)
+
+## 📡 Phase 3: 即時數據 ✅
+
+### Phase 3.1: WebSocket 即時價格推送 ✅
+- ✅ WebSocket 伺服器 (Fiber + gorilla/websocket)
+- ✅ 自動重連機制
+- ✅ 訂閱/取消訂閱股票
+- ✅ 每5秒自動廣播價格
+
+### Phase 3.2: 台股交易時間偵測 ✅
+- ✅ 市場狀態API (`/api/v1/market/status`)
+- ✅ 盤前/交易中/盤後/休市狀態
+- ✅ 台灣時區處理 (UTC+8)
+- ✅ 頁首狀態指示器 (脈動動畫)
+
+### Phase 3.3: 漲跌停視覺化 ✅
+- ✅ 漲停/跌停 badges
+- ✅ 台股顏色慣例 (紅漲綠跌)
+- ✅ 價格閃爍動畫
+
+### Phase 3.4: 盤中五檔報價 ✅
+- ✅ TWSE MIS API 整合
+- ✅ 5檔買賣報價面板
+- ✅ 比例成交量條
+- ✅ 漲跌停價格標示
+
+### Phase 3.5: 個股成交明細 ✅
+- ✅ 模擬成交tick顯示
+- ✅ LIVE/CLOSED 指示器
+- ✅ 滑入動畫效果
 
 ## 🏗️ 系統架構
 
@@ -190,6 +220,12 @@ docker-compose logs -f
 - `GET /api/v1/indicators/:symbol/kdj` - KDJ指標
 - `POST /api/v1/indicators/:symbol/batch` - 批次查詢
 
+### 即時數據
+- `GET /api/v1/market/status` - 市場狀態
+- `GET /api/v1/realtime/:symbol` - 即時報價 + 五檔
+- `GET /api/v1/realtime?symbols=...` - 批量報價
+- `WS /ws/realtime` - WebSocket 訂閱
+
 ### 健康檢查
 - `GET /health` - 系統健康狀態
 
@@ -239,10 +275,12 @@ PSM/
 │   │   ├── handlers/         # HTTP handlers
 │   │   │   ├── bulk_sync_handler.go
 │   │   │   ├── indicator_handler.go
-│   │   │   └── market_data_handler.go
+│   │   │   ├── market_data_handler.go
+│   │   │   └── realtime_handler.go
 │   │   ├── models/           # 資料模型
 │   │   └── services/         # 業務邏輯
 │   │       ├── market_data_service.go
+│   │       ├── realtime_service.go
 │   │       └── technical_analysis_service.go
 │   ├── Dockerfile
 │   └── go.mod
@@ -256,9 +294,14 @@ PSM/
 │   │   │   │   ├── StockChart.tsx
 │   │   │   │   └── ChartControls.tsx
 │   │   │   ├── DataSyncPanel.tsx
-│   │   │   └── PortfolioDashboard.tsx
+│   │   │   ├── MarketStatusIndicator.tsx
+│   │   │   ├── OrderBookPanel.tsx
+│   │   │   ├── PortfolioDashboard.tsx
+│   │   │   ├── RealtimePriceCell.tsx
+│   │   │   └── TradeTickPanel.tsx
 │   │   ├── lib/              # 工具函數
-│   │   │   └── chartApi.ts
+│   │   │   ├── chartApi.ts
+│   │   │   └── realtimeApi.ts
 │   │   └── types/            # TypeScript 類型
 │   ├── Dockerfile
 │   └── package.json
@@ -282,12 +325,12 @@ PSM/
 
 ## 📈 開發路線圖
 
-### Phase 3: 即時數據 (計劃中)
-- [ ] WebSocket 即時價格推送
-- [ ] 台股交易時間限制
-- [ ] 漲跌停視覺化
-- [ ] 盤中五檔報價
-- [ ] 個股成交明細
+### Phase 3: 即時數據 ✅
+- ✅ WebSocket 即時價格推送
+- ✅ 台股交易時間限制 (09:00-13:30)
+- ✅ 漲跌停視覺化 (漲停/跌停 badges)
+- ✅ 盤中五檔報價
+- ✅ 個股成交明細 (模擬)
 
 ### Phase 4: AI 分析 (計劃中)
 - [ ] 鉅亨網新聞爬取
@@ -361,4 +404,5 @@ Developed with ❤️ for Taiwan Stock Market Investors
 
 **Phase 1 Status:** ✅ 完成 (2024-01-22)  
 **Phase 2 Status:** ✅ 完成 (2026-01-22)  
+**Phase 3 Status:** ✅ 完成 (2026-01-22)  
 **Last Updated:** 2026-01-22
