@@ -100,10 +100,21 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
   const formatDuration = (start?: string, end?: string) => {
     if (!start) return '';
     const startTime = new Date(start).getTime();
-    const endTime = end ? new Date(end).getTime() : Date.now();
+    
+    // Check if end time is valid (not Go zero time: 0001-01-01)
+    const isValidEndTime = end && !end.startsWith('0001-01-01');
+    const endTime = isValidEndTime ? new Date(end).getTime() : Date.now();
+    
     const duration = Math.floor((endTime - startTime) / 1000);
-    const minutes = Math.floor(duration / 60);
+    if (duration < 0) return '';
+    
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
     const seconds = duration % 60;
+    
+    if (hours > 0) {
+      return `${hours}時${minutes}分${seconds}秒`;
+    }
     return `${minutes}分${seconds}秒`;
   };
 
