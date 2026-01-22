@@ -9,4 +9,5 @@ require (
 	github.com/redis/go-redis/v9 v9.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/shopspring/decimal v1.3.1
+	github.com/markcheno/go-talib v0.0.0-20190307022042-cd53a9264d70
 )

@@ -12,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/joho/godotenv"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 
 	// Get configuration
 	databaseURL := getEnv("DATABASE_URL", "postgres://psm_user:psm_password@localhost:5432/portfolio_db?sslmode=disable&client_encoding=UTF8")
+	redisURL := getEnv("REDIS_URL", "localhost:6379")
 	port := getEnv("PORT", "8080")
 
 	// Connect to database
@@ -31,17 +33,25 @@ func main() {
 	}
 	defer db.Close()
 
+	// Connect to Redis (optional, gracefully skip if unavailable)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisURL,
+	})
+	defer redisClient.Close()
+
 	// Initialize services
 	ledgerService := services.NewLedgerService(db)
 	stockService := services.NewStockService(db)
 	stockSyncService := services.NewStockSyncService(db)
 	marketDataService := services.NewMarketDataService(db)
+	taService := services.NewTechnicalAnalysisService(db, redisClient)
 
 	// Initialize handlers
 	ledgerHandler := handlers.NewLedgerHandler(ledgerService)
 	stockHandler := handlers.NewStockHandler(stockService)
 	stockSyncHandler := handlers.NewStockSyncHandler(stockSyncService)
 	marketDataHandler := handlers.NewMarketDataHandler(marketDataService)
+	indicatorHandler := handlers.NewIndicatorHandler(taService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -93,10 +103,18 @@ func main() {
 	api.Get("/stocks/:symbol", stockHandler.GetStock)
 	api.Post("/stocks/sync", stockSyncHandler.SyncStocks)
 
-	// Market data routes (Phase 2)
+	// Market data routes (Phase 2.1)
 	api.Get("/stocks/:symbol/ohlcv", marketDataHandler.GetOHLCV)
 	api.Post("/market/sync", marketDataHandler.SyncMarketData)
 	api.Post("/market/refresh-aggregates", marketDataHandler.RefreshAggregates)
+
+	// Technical indicator routes (Phase 2.2)
+	api.Get("/indicators/:symbol/ma", indicatorHandler.GetMA)
+	api.Get("/indicators/:symbol/rsi", indicatorHandler.GetRSI)
+	api.Get("/indicators/:symbol/macd", indicatorHandler.GetMACD)
+	api.Get("/indicators/:symbol/bb", indicatorHandler.GetBollingerBands)
+	api.Get("/indicators/:symbol/kdj", indicatorHandler.GetKDJ)
+	api.Post("/indicators/:symbol/batch", indicatorHandler.GetBatchIndicators)
 
 	// Start server
 	log.Printf("🚀 Server starting on port %s", port)
