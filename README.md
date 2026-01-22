@@ -1,6 +1,6 @@
 # 台股智能投資組合管理系統 (PSM)
 
-[![Phase](https://img.shields.io/badge/Phase-3%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
+[![Phase](https://img.shields.io/badge/Phase-4%20Complete-success?style=flat-square)](https://github.com/HenryLau1103/PMS)
 [![Go](https://img.shields.io/badge/Go-1.21-00ADD8?style=flat-square&logo=go)](https://go.dev/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-000000?style=flat-square&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
@@ -96,6 +96,51 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 - ✅ LIVE/CLOSED 指示器
 - ✅ 滑入動畫效果
 
+## 🤖 Phase 4: AI 分析與智能選股 ✅
+
+### Phase 4.1: 鉅亨網新聞爬取 ✅
+- ✅ Cnyes API 整合
+- ✅ 台股相關新聞自動抓取
+- ✅ 個股新聞篩選
+- ✅ 新聞快取機制
+
+### Phase 4.2: 中文情感分析 ✅
+- ✅ 關鍵字情感分析引擎
+- ✅ 50+ 正面財經詞彙
+- ✅ 60+ 負面財經詞彙
+- ✅ 情感分數計算 (-1 到 +1)
+
+### Phase 4.3: AI 投資建議 (Google Gemini) ✅
+- ✅ Google Gemini API 整合
+- ✅ 每日摘要分析
+- ✅ 投資建議生成
+- ✅ 風險評估報告
+- ✅ 新聞摘要整理
+- ✅ 24小時快取機制
+
+### Phase 4.4: 異常交易偵測 ✅
+- ✅ 成交量異常偵測 (Volume Spike)
+- ✅ 價格突破偵測 (Price Breakout)
+- ✅ 警報系統與通知
+- ✅ 警報確認機制
+
+### Phase 4.5: 智能選股推薦 ✅
+- ✅ 6種預設選股策略:
+  - 成交量突破 (Volume Breakout)
+  - 黃金交叉 (Golden Cross)
+  - 趨勢追蹤 (Trend Following)
+  - 正面情感 (Positive Sentiment)
+  - 52週新高 (52-Week High)
+  - 價值投資 (Value Hunting)
+- ✅ 快速篩選 (漲幅/跌幅/成交量/動能/突破)
+- ✅ 自定義篩選條件
+
+### Phase 4.6: AI 分析面板 ✅
+- ✅ 全幅寬度版面設計
+- ✅ 情感分析統計顯示
+- ✅ 4種分析類型按鈕
+- ✅ Gemini 連線狀態指示
+
 ## 🏗️ 系統架構
 
 ```
@@ -103,6 +148,7 @@ Portfolio Stock Management System - 專業的台股投資組合管理平台
 │   Frontend (React)  │◄───│  API Gateway (Go)    │◄───│  TimescaleDB        │
 │   Next.js + Chart   │    │  Fiber + TA-Lib      │    │  Hypertables        │
 │   TradingView       │    │  Redis Cache         │    │  Aggregates         │
+│   AI Panel          │    │  Gemini AI           │    │  News & Alerts      │
 └─────────────────────┘    └──────────────────────┘    └─────────────────────┘
 ```
 
@@ -193,6 +239,21 @@ docker-compose logs -f
 - 計算結果快取
 - 定期更新機制
 
+**stock_news** - 新聞資料表
+- 鉅亨網新聞儲存
+- 情感分析結果
+- 新聞分類標籤
+
+**ai_analysis_cache** - AI分析快取
+- Gemini 回應快取
+- 24小時TTL
+- 分析類型分類
+
+**stock_alerts** - 異常警報
+- 成交量/價格警報
+- 警報狀態追蹤
+- 確認機制
+
 ## 🔌 API 端點
 
 ### 交易管理
@@ -225,6 +286,33 @@ docker-compose logs -f
 - `GET /api/v1/realtime/:symbol` - 即時報價 + 五檔
 - `GET /api/v1/realtime?symbols=...` - 批量報價
 - `WS /ws/realtime` - WebSocket 訂閱
+
+### 新聞與情感分析
+- `GET /api/v1/news` - 最新新聞列表
+- `GET /api/v1/news/:symbol` - 個股新聞
+- `POST /api/v1/news/fetch` - 抓取最新新聞
+- `GET /api/v1/sentiment/:symbol` - 情感分析摘要
+- `POST /api/v1/sentiment/analyze` - 批次情感分析
+
+### AI 分析
+- `GET /api/v1/ai/status` - AI服務狀態
+- `GET /api/v1/ai/:symbol/analysis?type=...` - AI分析報告
+- `GET /api/v1/ai/:symbol/daily` - 每日摘要
+- `GET /api/v1/ai/:symbol/advice` - 投資建議
+- `DELETE /api/v1/ai/:symbol/cache` - 清除快取
+
+### 異常偵測
+- `GET /api/v1/alerts` - 所有警報
+- `GET /api/v1/alerts/:symbol/volume` - 成交量異常
+- `GET /api/v1/alerts/:symbol/price` - 價格突破
+- `POST /api/v1/alerts/scan` - 掃描所有股票
+- `POST /api/v1/alerts/:id/ack` - 確認警報
+
+### 智能選股
+- `GET /api/v1/screener/presets` - 預設策略列表
+- `GET /api/v1/screener/preset/:name` - 執行預設策略
+- `GET /api/v1/screener/quick/:type` - 快速篩選
+- `POST /api/v1/screener/screen` - 自定義篩選
 
 ### 健康檢查
 - `GET /health` - 系統健康狀態
@@ -273,14 +361,24 @@ PSM/
 │   ├── internal/
 │   │   ├── database/         # 資料庫連接
 │   │   ├── handlers/         # HTTP handlers
+│   │   │   ├── ai_handler.go
+│   │   │   ├── alert_handler.go
 │   │   │   ├── bulk_sync_handler.go
 │   │   │   ├── indicator_handler.go
 │   │   │   ├── market_data_handler.go
-│   │   │   └── realtime_handler.go
+│   │   │   ├── news_handler.go
+│   │   │   ├── realtime_handler.go
+│   │   │   ├── screener_handler.go
+│   │   │   └── sentiment_handler.go
 │   │   ├── models/           # 資料模型
 │   │   └── services/         # 業務邏輯
+│   │       ├── ai_service.go
+│   │       ├── alert_service.go
 │   │       ├── market_data_service.go
+│   │       ├── news_service.go
 │   │       ├── realtime_service.go
+│   │       ├── screener_service.go
+│   │       ├── sentiment_service.go
 │   │       └── technical_analysis_service.go
 │   ├── Dockerfile
 │   └── go.mod
@@ -293,6 +391,7 @@ PSM/
 │   │   │   ├── Chart/        # 圖表組件
 │   │   │   │   ├── StockChart.tsx
 │   │   │   │   └── ChartControls.tsx
+│   │   │   ├── AIAnalysisPanel.tsx
 │   │   │   ├── DataSyncPanel.tsx
 │   │   │   ├── MarketStatusIndicator.tsx
 │   │   │   ├── OrderBookPanel.tsx
@@ -309,7 +408,8 @@ PSM/
 │   └── migrations/           # SQL 遷移腳本
 │       ├── 001_init.sql
 │       ├── 002_taiwan_stocks.sql
-│       └── 003_market_data.sql
+│       ├── 003_market_data.sql
+│       └── 004_news_and_ai.sql
 ├── docker-compose.yml
 └── README.md
 ```
@@ -325,19 +425,13 @@ PSM/
 
 ## 📈 開發路線圖
 
-### Phase 3: 即時數據 ✅
-- ✅ WebSocket 即時價格推送
-- ✅ 台股交易時間限制 (09:00-13:30)
-- ✅ 漲跌停視覺化 (漲停/跌停 badges)
-- ✅ 盤中五檔報價
-- ✅ 個股成交明細 (模擬)
-
-### Phase 4: AI 分析 (計劃中)
-- [ ] 鉅亨網新聞爬取
-- [ ] 中文情感分析
-- [ ] GPT-4 投資建議
-- [ ] 異常交易偵測
-- [ ] 智能選股推薦
+### Phase 4: AI 分析與智能選股 ✅
+- ✅ 鉅亨網新聞爬取
+- ✅ 中文情感分析
+- ✅ Google Gemini 投資建議
+- ✅ 異常交易偵測
+- ✅ 智能選股推薦
+- ✅ AI 分析面板
 
 ### Phase 5: 優化與擴展 (計劃中)
 - [ ] 效能優化
@@ -346,6 +440,8 @@ PSM/
 - [ ] 多帳戶管理
 - [ ] 權限控制系統
 - [ ] 回測系統
+- [ ] 定時新聞抓取 (Cron)
+- [ ] 警報通知 (Email/Push)
 
 ## 🐛 疑難排解
 
@@ -392,6 +488,26 @@ curl "http://localhost:8080/api/v1/indicators/2330/ma?period=20"
 curl "http://localhost:8080/api/v1/market/bulk-sync/status"
 ```
 
+### 測試AI服務狀態
+```bash
+curl "http://localhost:8080/api/v1/ai/status"
+```
+
+### 測試智能選股
+```bash
+curl "http://localhost:8080/api/v1/screener/quick/volume"
+```
+
+## ⚙️ 環境變數設定
+
+### AI 功能設定 (docker-compose.yml)
+```yaml
+backend:
+  environment:
+    - GEMINI_API_KEY=your-gemini-api-key
+    - GEMINI_MODEL=gemini-2.0-flash-exp  # 可選，預設 gemini-2.0-flash-exp
+```
+
 ## 📝 License
 
 MIT License
@@ -405,4 +521,5 @@ Developed with ❤️ for Taiwan Stock Market Investors
 **Phase 1 Status:** ✅ 完成 (2024-01-22)  
 **Phase 2 Status:** ✅ 完成 (2026-01-22)  
 **Phase 3 Status:** ✅ 完成 (2026-01-22)  
+**Phase 4 Status:** ✅ 完成 (2026-01-22)  
 **Last Updated:** 2026-01-22
