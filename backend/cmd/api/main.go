@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/websocket/v2"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
@@ -45,6 +46,7 @@ func main() {
 	stockSyncService := services.NewStockSyncService(db)
 	marketDataService := services.NewMarketDataService(db)
 	taService := services.NewTechnicalAnalysisService(db, redisClient)
+	realtimeService := services.NewRealtimeService(db)
 
 	// Initialize handlers
 	ledgerHandler := handlers.NewLedgerHandler(ledgerService)
@@ -53,6 +55,7 @@ func main() {
 	marketDataHandler := handlers.NewMarketDataHandler(marketDataService)
 	indicatorHandler := handlers.NewIndicatorHandler(taService)
 	bulkSyncHandler := handlers.NewBulkSyncHandler(marketDataService, db)
+	realtimeHandler := handlers.NewRealtimeHandler(realtimeService)
 
 	// Create Fiber app
 	app := fiber.New(fiber.Config{
@@ -121,6 +124,15 @@ func main() {
 	api.Get("/market/bulk-sync/status", bulkSyncHandler.GetSyncStatus)
 	api.Post("/market/bulk-sync/start", bulkSyncHandler.StartBulkSync)
 	api.Post("/market/bulk-sync/stop", bulkSyncHandler.StopBulkSync)
+
+	// Real-time data routes (Phase 3.1)
+	api.Get("/market/status", realtimeHandler.GetMarketStatus)
+	api.Get("/realtime/:symbol", realtimeHandler.GetRealtimeQuote)
+	api.Get("/realtime", realtimeHandler.GetBatchQuotes)
+
+	// WebSocket endpoint for real-time updates
+	app.Use("/ws", realtimeHandler.WebSocketUpgrade)
+	app.Get("/ws/realtime", websocket.New(realtimeHandler.HandleWebSocket))
 
 	// Start server
 	log.Printf("🚀 Server starting on port %s", port)

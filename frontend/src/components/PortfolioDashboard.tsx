@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { getPositions, getStock } from '@/lib/api';
-import type { Position, TaiwanStock } from '@/types/api';
+import type { Position, TaiwanStock, RealtimeQuote } from '@/types/api';
 import { formatCurrency, formatPercentage, getPnLColorClass } from '@/lib/utils';
+import RealtimePriceCell from './RealtimePriceCell';
 
 interface PortfolioDashboardProps {
   portfolioId: string;
@@ -12,6 +13,9 @@ interface PortfolioDashboardProps {
 
 interface PositionWithName extends Position {
   stock_name?: string;
+  current_price?: number;
+  unrealized_pnl?: number;
+  unrealized_pnl_pct?: number;
 }
 
 export default function PortfolioDashboard({ portfolioId, refreshTrigger = 0 }: PortfolioDashboardProps) {
@@ -140,6 +144,9 @@ export default function PortfolioDashboard({ portfolioId, refreshTrigger = 0 }: 
                   平均成本
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  現價
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   總成本
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -167,6 +174,13 @@ export default function PortfolioDashboard({ portfolioId, refreshTrigger = 0 }: 
                     <div className="text-sm text-gray-900">
                       {formatCurrency(position.avg_cost_per_share)}
                     </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <RealtimePriceCell 
+                      symbol={position.symbol} 
+                      showChange={true}
+                      showLimitAlert={true}
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right">
                     <div className="text-sm font-medium text-gray-900">

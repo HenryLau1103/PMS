@@ -71,3 +71,57 @@ export interface TaiwanStock {
   created_at: string;
   updated_at: string;
 }
+
+// Real-time data types (Phase 3)
+export interface OrderBookLevel {
+  price: string;
+  volume: number;
+}
+
+export interface OrderBook {
+  bids: OrderBookLevel[];
+  asks: OrderBookLevel[];
+}
+
+export interface RealtimeQuote {
+  symbol: string;
+  name: string;
+  price: string;
+  change: string;
+  change_percent: string;
+  open: string;
+  high: string;
+  low: string;
+  prev_close: string;
+  volume: number;
+  turnover: string;
+  bid_price: string;
+  ask_price: string;
+  bid_volume: number;
+  ask_volume: number;
+  trade_time: string;
+  is_open: boolean;
+  limit_up: string;
+  limit_down: string;
+  updated_at: string;
+  order_book?: OrderBook;
+}
+
+export interface MarketStatus {
+  is_open: boolean;
+  status: 'pre_market' | 'open' | 'after_hours' | 'closed' | 'holiday';
+  message: string;
+  next_open_time?: string;
+  server_time: string;
+}
+
+export interface WSMessage {
+  action: 'subscribe' | 'unsubscribe';
+  symbols: string[];
+}
+
+export interface WSResponse {
+  type: 'quote' | 'status' | 'error' | 'subscribed' | 'unsubscribed';
+  data?: RealtimeQuote | MarketStatus | string[];
+  message?: string;
+}

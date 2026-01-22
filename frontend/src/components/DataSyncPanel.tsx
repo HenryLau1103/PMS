@@ -141,16 +141,30 @@ export default function DataSyncPanel({ portfolioId }: DataSyncPanelProps) {
         <button
           onClick={() => handleStartSync(true)}
           disabled={loading || syncStatus?.is_running}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
         >
-          優先同步持倉股票
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              啟動中...
+            </>
+          ) : (
+            '優先同步持倉股票'
+          )}
         </button>
         <button
           onClick={() => handleStartSync(false)}
           disabled={loading || syncStatus?.is_running}
-          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium"
+          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors text-sm font-medium flex items-center justify-center gap-2"
         >
-          同步所有股票
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              啟動中...
+            </>
+          ) : (
+            '同步所有股票'
+          )}
         </button>
         {syncStatus?.is_running && (
           <button
